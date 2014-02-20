@@ -6,13 +6,6 @@ import lob
 import shelve
 import sys
 
-config = json.loads("config.json")
-lob.api_key = config['api_key']
-postcard_from_address = config['postcard_from_address']
-postcard_message = config['postcard_message']
-postcard_front = config['postcard_front']
-postcard_name = config['postcard_name']
-
 class ParseKickstarterAddresses:
     def __init__(self, filename):
         self.items = []
@@ -46,12 +39,19 @@ def kickstarter_dict_to_lob_dict(dictionary):
     return address_dict
 
 def main():
+    filename = sys.argv[1]
+    config = json.load(open("config.json"))
+    lob.api_key = config['api_key']
+    postcard_from_address = config['postcard_from_address']
+    postcard_message = config['postcard_message']
+    postcard_front = config['postcard_front']
+    postcard_name = config['postcard_name']
+
     history = shelve.open('lob_history')
 
-    filename = sys.argv[1]
     addresses = ParseKickstarterAddresses(filename)
 
-    for line in addresses.items[0:10]:
+    for line in addresses.items[0:1]:
         md5 = line['md5']
         to_person = line['Shipping Name']
         if md5 in history:
