@@ -3,7 +3,6 @@ import csv
 import hashlib
 import json
 import lob
-import shelve
 import sys
 
 class ParseKickstarterAddresses:
