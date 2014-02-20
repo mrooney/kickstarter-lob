@@ -57,7 +57,7 @@ def main():
     already_sent = []
 
     print("Verifying addresses of backers...")
-    for line in addresses.items[0:10]:
+    for line in addresses.items[0:12]:
         to_person = line['Shipping Name']
         to_address = kickstarter_dict_to_lob_dict(line)
         try:
