@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import csv
-import hashlib
 import json
 import lob
 import sys
@@ -13,13 +12,8 @@ class ParseKickstarterAddresses:
             for row in reader:
                 self.items.append(row)
 
-def addr_str(addr):
+def addr_identifier(addr):
     return u"{name}|{address_line1}|{address_line2}|{address_city}|{address_state}|{address_zip}|{address_country}".format(**addr).upper() 
-
-def addr_md5(addr):
-    m = hashlib.md5()
-    m.update(addr_str(addr))
-    return m.hexdigest()
 
 def kickstarter_dict_to_lob_dict(dictionary):
     ks_to_lob = {'Shipping Name': 'name',
@@ -40,10 +34,17 @@ def main():
     lob.api_key = config['api_key']
 
     print("Fetching list of any postcards already sent...")
-    processed_md5s = set()
-    for processed in lob.Postcard.list():
-        md5 = addr_md5(processed.to.to_dict())
-        processed_md5s.add(md5)
+    processed_addrs = set()
+    postcards = []
+    postcards_result = lob.Postcard.list(count=100)
+    while len(postcards_result):
+        postcards.extend(postcards_result)
+        postcards_result = lob.Postcard.list(count=100, offset=len(postcards))
+
+    print("...found {} previously sent postcards.".format(len(postcards)))
+    for processed in postcards:
+        identifier = addr_identifier(processed.to.to_dict())
+        processed_addrs.add(identifier)
 
     postcard_from_address = config['postcard_from_address']
     postcard_message = config['postcard_message']
@@ -56,7 +57,7 @@ def main():
     already_sent = []
 
     print("Verifying addresses of backers...")
-    for line in addresses.items:#[:10]
+    for line in addresses.items:
         to_person = line['Shipping Name']
         to_address = kickstarter_dict_to_lob_dict(line)
         try:
@@ -68,8 +69,7 @@ def main():
             print(msg.format(line['Email']))
             continue
 
-        md5 = addr_md5(to_address)
-        if md5 in processed_md5s:
+        if addr_identifier(to_address) in processed_addrs:
             already_sent.append(to_address)
         else:
             to_send.append(to_address)
