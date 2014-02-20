@@ -13,7 +13,9 @@ Usage
 1. `python kslob.py your-kickstarter-backer-report.csv`
 
 You can safely run kslob.py multiple times with updated exports; it will only send one
-postcard per address (per Lob.com API key).
+postcard per address (per Lob.com API key). Note that this does mean
+that a backer who changes their address between exports will receive a
+second postcard, however this is probably A Good Thing.
 
 How It Works
 ============
