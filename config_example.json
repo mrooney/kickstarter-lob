@@ -1,0 +1,15 @@
+{
+    api_key: 'test_abcd1234',
+    postcard_from_address = {
+        'name': 'Stick Stickly',
+        'address_line1': 'P.O. Box 963',
+        'address_city': 'New York',
+        'address_state': 'NY',
+        'address_zip': '10108',
+        'address_country': 'US'
+    },
+    postcard_message = "Thanks for your support on Kickstarter!",
+    postcard_front = 'https://www.lob.com/postcardfront.pdf',
+    postcard_name = "Kickstarter postcard"
+}
+
