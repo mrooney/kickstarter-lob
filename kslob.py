@@ -33,6 +33,11 @@ def main():
     config = json.load(open("config.json"))
     lob.api_key = config['api_key']
 
+    postcard_from_address = config['postcard_from_address']
+    postcard_message = config['postcard_message']
+    postcard_front = config['postcard_front']
+    postcard_name = config['postcard_name']
+
     print("Fetching list of any postcards already sent...")
     processed_addrs = set()
     postcards = []
@@ -41,15 +46,15 @@ def main():
         postcards.extend(postcards_result)
         postcards_result = lob.Postcard.list(count=100, offset=len(postcards))
 
-    print("...found {} previously sent postcards.".format(len(postcards)))
-    for processed in postcards:
+    postcards_sent = []
+    for postcard in postcards:
+        if postcard.name == postcard_name:
+            postcards_sent.append(postcard)
+
+    print("...found {} previously sent postcards.".format(len(postcards_sent)))
+    for processed in postcards_sent:
         identifier = addr_identifier(processed.to.to_dict())
         processed_addrs.add(identifier)
-
-    postcard_from_address = config['postcard_from_address']
-    postcard_message = config['postcard_message']
-    postcard_front = config['postcard_front']
-    postcard_name = config['postcard_name']
 
     addresses = ParseKickstarterAddresses(filename)
 
@@ -85,7 +90,12 @@ def main():
         successes = failures = 0
         for to_address in to_send:
             try:
-                rv = lob.Postcard.create(to=to_address, name=postcard_name, from_address=postcard_from_address, front=postcard_front, message=postcard_message)
+                rv = lob.Postcard.create(to=to_address,
+                                         name=postcard_name,
+                                         from_address=postcard_from_address,
+                                         front=postcard_front,
+                                         full_bleed=1,
+                                         message=postcard_message)
                 print("Postcard sent to {}! ({})".format(to_address['name'], rv.id))
                 successes += 1
             except lob.exceptions.LobError:
