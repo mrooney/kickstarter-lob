@@ -65,6 +65,10 @@ def main():
     for line in addresses.items:
         to_person = line['Shipping Name']
         to_address = kickstarter_dict_to_lob_dict(line)
+        if not to_person:
+            msg = 'warning: no address found for {}, skipping this backer'
+            print(msg.format(line['Email']))
+            continue
         try:
             to_name = to_address['name']
             to_address = lob.AddressVerify.verify(**to_address).to_dict()['address']
