@@ -66,17 +66,27 @@ def main():
         to_person = line['Shipping Name']
         to_address = kickstarter_dict_to_lob_dict(line)
         if not to_person:
-            msg = 'warning: no address found for {}, skipping this backer'
+            msg = ("Warning: No address found for '{}'. "
+                   "Skipping this backer.")
             print(msg.format(line['Email']))
             continue
         try:
             to_name = to_address['name']
             to_address = lob.AddressVerify.verify(**to_address).to_dict()['address']
             to_address['name'] = to_name
-        except lob.exceptions.LobError:
-            msg = 'warning: address verification failed for {}, cannot send to this backer.'
-            print(msg.format(line['Email']))
-            continue
+        except lob.exceptions.LobError, e:
+            msg = "Warning: Address verification failed for '{}'. "
+            msg = msg.format(line['Email'])
+            error = e[0]
+            if error:
+                error_msg = error[0]['message']
+                msg += "Error: '{}'. Skipping this backer.".format(error_msg)
+                print(msg)
+                continue
+            else:
+                msg += "Mailing postcard anyway."
+                print(msg)
+                print("Address: {}".format(to_address))
 
         if addr_identifier(to_address) in processed_addrs:
             already_sent.append(to_address)
