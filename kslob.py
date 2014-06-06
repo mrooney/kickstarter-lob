@@ -13,6 +13,8 @@ class ParseKickstarterAddresses:
                 self.items.append(row)
 
 def addr_identifier(addr):
+    # Use the line below if you sent postcards before Kickstarter changed their CSV format and need to send some more.
+    # return u"{name}|{address_line1}|{address_line2}|{address_city}|{address_zip}".format(**addr).upper() 
     return u"{name}|{address_line1}|{address_line2}|{address_city}|{address_state}|{address_zip}|{address_country}".format(**addr).upper() 
 
 def kickstarter_dict_to_lob_dict(dictionary):
@@ -22,7 +24,7 @@ def kickstarter_dict_to_lob_dict(dictionary):
                  'Shipping City': 'address_city',
                  'Shipping State': 'address_state',
                  'Shipping Postal Code': 'address_zip',
-                 'Shipping Country': 'address_country'}
+                 'Shipping Country Code': 'address_country'}
     address_dict = {}
     for key in ks_to_lob.keys():
         address_dict[ks_to_lob[key]] = dictionary[key]
